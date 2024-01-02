@@ -1,5 +1,3 @@
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -28,10 +26,8 @@ public class Main {
 				String title = sc.nextLine();
 				System.out.print("내용 : ");
 				String body = sc.nextLine();
-
 				Article article = new Article(id, regDate, title, body);
 				articles.add(article);
-
 				System.out.printf("%d번 글이 생성 되었습니다.\n", id);
 				lastArticleId++;
 			} else if (cmd.equals("article list")) {
@@ -54,9 +50,7 @@ public class Main {
 					System.out.println("번호는 정수로 입력해");
 					continue;
 				}
-
 				Article foundArticle = null;
-
 				for (int i = 0; i < articles.size(); i++) {
 					Article article = articles.get(i);
 					if (article.getId() == id) {
@@ -64,7 +58,6 @@ public class Main {
 						break;
 					}
 				}
-
 				if (foundArticle == null) {
 					System.out.printf("%d번 게시글은 없습니다\n", id);
 				} else {
@@ -72,6 +65,40 @@ public class Main {
 					System.out.println("날짜 : " + foundArticle.getRegDate());
 					System.out.println("제목 : " + foundArticle.getTitle());
 					System.out.println("내용 : " + foundArticle.getBody());
+				}
+
+			} else if (cmd.startsWith("article delete")) {
+
+				String[] cmdDiv = cmd.split(" ");
+
+				int id = 0;
+
+				try {
+					id = Integer.parseInt(cmdDiv[2]);
+				} catch (Exception e) {
+					System.out.println("번호는 정수로 입력해");
+					continue;
+				}
+
+				int foundIndex = -1;
+//				Article foundArticle = null;
+
+				for (int i = 0; i < articles.size(); i++) {
+					Article article = articles.get(i);
+					if (article.getId() == id) {
+						foundIndex = i;
+//						foundArticle = article;
+						break;
+					}
+				}
+
+//				if(foundArticle == null)
+				if (foundIndex == -1) {
+					System.out.printf("%d번 게시글은 없습니다\n", id);
+				} else {
+//					articles.remove(id-1);
+					articles.remove(foundIndex);
+					System.out.println(id + "번 글이 삭제되었습니다.");
 				}
 
 			} else {
@@ -86,7 +113,6 @@ public class Main {
 class Article {
 	private int id;
 	private String regDate;
-
 	private String title;
 	private String body;
 
