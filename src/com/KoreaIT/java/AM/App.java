@@ -1,30 +1,37 @@
+package com.KoreaIT.java.AM;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Main {
-	static List<Article> articles = new ArrayList<>();
-	static List<Member> members = new ArrayList<>();
+import com.KoreaIT.java.AM.dto.Article;
+import com.KoreaIT.java.AM.dto.Member;
+import com.KoreaIT.java.AM.util.Util;
 
-	public static void main(String[] args) {
+public class App {
+
+	List<Article> articles;
+	List<Member> members;
+
+	public App() {
+		articles = new ArrayList<>();
+		members = new ArrayList<>();
+	}
+
+	public void run() {
 		System.out.println("== 프로그램 시작 == ");
 
 		makeTestData();
-
 		Scanner sc = new Scanner(System.in);
-
 		int lastArticleId = 3;
 		int lastMemberId = 0;
-
 		while (true) {
 			System.out.print("명령어 > ");
 			String cmd = sc.nextLine().trim();
-
 			if (cmd.length() == 0) {
 				System.out.println("명령어를 입력하세요");
 				continue;
 			}
-
 			if (cmd.equals("exit")) {
 				break;
 			}
@@ -43,26 +50,21 @@ public class Main {
 					break;
 				}
 				String loginPw = null;
-
 				while (true) {
 					System.out.print("로그인 비밀번호 : ");
 					loginPw = sc.nextLine();
 					System.out.print("로그인 비밀번호 확인: ");
 					String loginPwConfirm = sc.nextLine();
-
 					if (loginPw.equals(loginPwConfirm) == false) {
 						System.out.println("비밀번호 다시 확인해");
 						continue;
 					}
 					break;
 				}
-
 				System.out.print("이름 : ");
 				String name = sc.nextLine();
-
 				Member member = new Member(id, regDate, loginId, loginPw, name);
 				members.add(member);
-
 				System.out.printf("%d번 회원이 가입 되었습니다. %s님 환영합니다.\n", id, name);
 				lastMemberId++;
 			} else if (cmd.equals("article write")) {
@@ -74,10 +76,8 @@ public class Main {
 				String title = sc.nextLine();
 				System.out.print("내용 : ");
 				String body = sc.nextLine();
-
 				Article article = new Article(id, regDate, updateDate, title, body);
 				articles.add(article);
-
 				System.out.printf("%d번 글이 생성 되었습니다.\n", id);
 				lastArticleId++;
 			} else if (cmd.startsWith("article list")) {
@@ -86,15 +86,11 @@ public class Main {
 					System.out.println("아무것도 없어");
 					continue;
 				}
-
 				String searchKeyword = cmd.substring("article list".length()).trim();
-
 				List<Article> forPrintArticles = articles;
-
 				if (searchKeyword.length() > 0) {
 					System.out.println("검색어 : " + searchKeyword);
 					forPrintArticles = new ArrayList<>();
-
 					for (Article article : articles) {
 						if (article.getTitle().contains(searchKeyword)) {
 							forPrintArticles.add(article);
@@ -106,7 +102,6 @@ public class Main {
 						continue;
 					}
 				}
-
 				System.out.println("  번호  /  제목    /   작성일     /   조회");
 				for (int i = forPrintArticles.size() - 1; i >= 0; i--) {
 					Article article = forPrintArticles.get(i);
@@ -117,24 +112,17 @@ public class Main {
 						System.out.printf("  %4d  /   %s    /     %s   /   %d\n", article.getId(), article.getTitle(),
 								article.getRegDate().split(" ")[0], article.getHit());
 					}
-
 				}
-
 			} else if (cmd.startsWith("article detail")) {
-
 				String[] cmdDiv = cmd.split(" ");
-
 				int id = 0;
-
 				try {
 					id = Integer.parseInt(cmdDiv[2]);
 				} catch (Exception e) {
 					System.out.println("번호는 정수로 입력해");
 					continue;
 				}
-
 				Article foundArticle = getArticleById(id);
-
 				if (foundArticle == null) {
 					System.out.printf("%d번 게시글은 없습니다\n", id);
 					continue;
@@ -145,58 +133,43 @@ public class Main {
 				System.out.println("제목 : " + foundArticle.getTitle());
 				System.out.println("내용 : " + foundArticle.getBody());
 				System.out.println("조회 : " + foundArticle.getHit());
-
 				foundArticle.setHit(foundArticle.getHit() + 1);
-
 			} else if (cmd.startsWith("article delete")) {
-
 				String[] cmdDiv = cmd.split(" ");
-
 				int id = 0;
-
 				try {
 					id = Integer.parseInt(cmdDiv[2]);
 				} catch (Exception e) {
 					System.out.println("번호는 정수로 입력해");
 					continue;
 				}
-
 				Article foundArticle = getArticleById(id);
-
 				if (foundArticle == null) {
 					System.out.printf("%d번 게시글은 없습니다\n", id);
 					continue;
 				}
 				articles.remove(foundArticle);
 				System.out.println(id + "번 글이 삭제되었습니다.");
-
 			} else if (cmd.startsWith("article modify")) {
-
 				String[] cmdDiv = cmd.split(" ");
-
 				int id = 0;
-
 				try {
 					id = Integer.parseInt(cmdDiv[2]);
 				} catch (Exception e) {
 					System.out.println("번호는 정수로 입력해");
 					continue;
 				}
-
 				Article foundArticle = getArticleById(id);
-
 				if (foundArticle == null) {
 					System.out.printf("%d번 게시글은 없습니다\n", id);
 					continue;
 				}
-
 				System.out.println("기존 제목 : " + foundArticle.getTitle());
 				System.out.println("기존 내용 : " + foundArticle.getBody());
 				System.out.print("새 제목 : ");
 				String newTitle = sc.nextLine();
 				System.out.print("새 내용 : ");
 				String newBody = sc.nextLine();
-
 				foundArticle.setUpdateDate(Util.getNowDate_TimeStr());
 				foundArticle.setTitle(newTitle);
 				foundArticle.setBody(newBody);
@@ -205,23 +178,22 @@ public class Main {
 				System.out.println("사용할 수 없는 명령어입니다");
 			}
 		}
-
 		System.out.println("== 프로그램 끝 == ");
 
 		sc.close();
+
 	}
 
-	private static boolean isJoinableLoginId(String loginId) {
+	private boolean isJoinableLoginId(String loginId) {
 		for (Member member : members) {
 			if (member.getLoginId().equals(loginId)) {
 				return false;
 			}
 		}
-
 		return true;
 	}
 
-	private static Article getArticleById(int id) {
+	private Article getArticleById(int id) {
 		for (Article article : articles) {
 			if (article.getId() == id) {
 				return article;
@@ -230,140 +202,11 @@ public class Main {
 		return null;
 	}
 
-	private static void makeTestData() {
+	private void makeTestData() {
 		System.out.println("테스트를 위한 데이터를 생성합니다.");
 		articles.add(new Article(1, "2023-12-12 12:12:12", Util.getNowDate_TimeStr(), "제목123", "내용1", 11));
 		articles.add(new Article(2, "2024-01-01 12:12:12", Util.getNowDate_TimeStr(), "제목2", "내용2", 22));
 		articles.add(new Article(3, Util.getNowDate_TimeStr(), Util.getNowDate_TimeStr(), "제목1233", "내용3", 33));
 	}
-}
 
-class Member {
-	private int id;
-	private String regDate;
-
-	private String loginId;
-	private String loginPw;
-	private String name;
-
-	public Member(int id, String regDate, String loginId, String loginPw, String name) {
-		this.id = id;
-		this.regDate = regDate;
-		this.loginId = loginId;
-		this.loginPw = loginPw;
-		this.name = name;
-	}
-
-	public String getLoginId() {
-		return loginId;
-	}
-
-	public void setLoginId(String loginId) {
-		this.loginId = loginId;
-	}
-
-	public String getLoginPw() {
-		return loginPw;
-	}
-
-	public void setLoginPw(String loginPw) {
-		this.loginPw = loginPw;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getRegDate() {
-		return regDate;
-	}
-
-	public void setRegDate(String regDate) {
-		this.regDate = regDate;
-	}
-
-}
-
-class Article {
-	private int id;
-	private String regDate;
-	private String updateDate;
-
-	private String title;
-	private String body;
-
-	private int hit;
-
-	public Article(int id, String regDate, String updateDate, String title, String body) {
-		this(id, regDate, updateDate, title, body, 0);
-	}
-
-	public Article(int id, String regDate, String updateDate, String title, String body, int hit) {
-		this.id = id;
-		this.regDate = regDate;
-		this.updateDate = updateDate;
-		this.title = title;
-		this.body = body;
-		this.hit = hit;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getRegDate() {
-		return regDate;
-	}
-
-	public void setRegDate(String regDate) {
-		this.regDate = regDate;
-	}
-
-	public String getUpdateDate() {
-		return updateDate;
-	}
-
-	public void setUpdateDate(String updateDate) {
-		this.updateDate = updateDate;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getBody() {
-		return body;
-	}
-
-	public void setBody(String body) {
-		this.body = body;
-	}
-
-	public int getHit() {
-		return hit;
-	}
-
-	public void setHit(int hit) {
-		this.hit = hit;
-	}
 }
