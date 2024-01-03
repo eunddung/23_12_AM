@@ -7,10 +7,11 @@ import com.KoreaIT.java.AM.dto.Article;
 import com.KoreaIT.java.AM.util.Util;
 
 public class ArticleController extends Controller {
-
 	private List<Article> articles;
 	private Scanner sc;
 	private String cmd;
+
+	int lastArticleId = 3;
 
 	public ArticleController(Scanner sc) {
 		this.articles = new ArrayList<>();
@@ -19,7 +20,6 @@ public class ArticleController extends Controller {
 
 	public void doAction(String actionMethodName, String cmd) {
 		this.cmd = cmd;
-
 		switch (actionMethodName) {
 		case "write":
 			doWrite();
@@ -42,8 +42,6 @@ public class ArticleController extends Controller {
 		}
 	}
 
-	int lastArticleId = 3;
-
 	private void doWrite() {
 		System.out.println("==게시글 작성==");
 		int id = lastArticleId + 1;
@@ -57,7 +55,6 @@ public class ArticleController extends Controller {
 		articles.add(article);
 		System.out.printf("%d번 글이 생성 되었습니다.\n", id);
 		lastArticleId++;
-
 	}
 
 	private void showList() {
@@ -93,12 +90,10 @@ public class ArticleController extends Controller {
 						article.getRegDate().split(" ")[0], article.getHit());
 			}
 		}
-
 	}
 
 	private void showDetail() {
 		String[] cmdDiv = cmd.split(" ");
-
 		int id = 0;
 		try {
 			id = Integer.parseInt(cmdDiv[2]);
@@ -118,12 +113,10 @@ public class ArticleController extends Controller {
 		System.out.println("내용 : " + foundArticle.getBody());
 		System.out.println("조회 : " + foundArticle.getHit());
 		foundArticle.setHit(foundArticle.getHit() + 1);
-
 	}
 
 	private void doDelete() {
 		String[] cmdDiv = cmd.split(" ");
-
 		int id = 0;
 		try {
 			id = Integer.parseInt(cmdDiv[2]);
@@ -138,12 +131,10 @@ public class ArticleController extends Controller {
 		}
 		articles.remove(foundArticle);
 		System.out.println(id + "번 글이 삭제되었습니다.");
-
 	}
 
 	private void doModify() {
 		String[] cmdDiv = cmd.split(" ");
-
 		int id = 0;
 		try {
 			id = Integer.parseInt(cmdDiv[2]);
@@ -178,7 +169,7 @@ public class ArticleController extends Controller {
 	}
 
 	public void makeTestData() {
-		System.out.println("테스트를 위한 데이터를 생성합니다.");
+		System.out.println("테스트를 위한 게시글 데이터를 생성합니다.");
 		articles.add(new Article(1, "2023-12-12 12:12:12", Util.getNowDate_TimeStr(), "제목123", "내용1", 11));
 		articles.add(new Article(2, "2024-01-01 12:12:12", Util.getNowDate_TimeStr(), "제목2", "내용2", 22));
 		articles.add(new Article(3, Util.getNowDate_TimeStr(), Util.getNowDate_TimeStr(), "제목1233", "내용3", 33));
