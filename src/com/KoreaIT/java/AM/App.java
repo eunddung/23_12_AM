@@ -1,10 +1,8 @@
 package com.KoreaIT.java.AM;
-
 import java.util.Scanner;
 import com.KoreaIT.java.AM.controller.ArticleController;
 import com.KoreaIT.java.AM.controller.Controller;
 import com.KoreaIT.java.AM.controller.MemberController;
-
 public class App {
 	public void run() {
 		System.out.println("== 프로그램 시작 == ");
@@ -39,9 +37,7 @@ public class App {
 				System.out.println("사용할 수 없는 명령어입니다3");
 				continue;
 			}
-
 			String forLoginCheck = controllerName + "/" + actionMethodName;
-
 			switch (forLoginCheck) {
 			case "article/write":
 			case "article/modify":
@@ -63,10 +59,8 @@ public class App {
 				}
 				break;
 			}
-
 			controller.doAction(actionMethodName, cmd);
 		}
-
 		System.out.println("== 프로그램 끝 == ");
 		sc.close();
 	}
