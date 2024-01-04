@@ -1,19 +1,24 @@
 package com.KoreaIT.java.AM.controller;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import com.KoreaIT.java.AM.Container;
 import com.KoreaIT.java.AM.dto.Article;
+import com.KoreaIT.java.AM.dto.Member;
 import com.KoreaIT.java.AM.util.Util;
 
 public class ArticleController extends Controller {
 	private List<Article> articles;
 	private Scanner sc;
 	private String cmd;
+
+	List<Member> members = Container.memberDao.members;
+
 	int lastArticleId = 3;
 
 	public ArticleController(Scanner sc) {
-		this.articles = new ArrayList<>();
+		this.articles = Container.articleDao.articles;
 		this.sc = sc;
 	}
 
@@ -40,7 +45,6 @@ public class ArticleController extends Controller {
 			break;
 		}
 	}
-
 	private void doWrite() {
 		System.out.println("==게시글 작성==");
 		int id = lastArticleId + 1;
@@ -55,7 +59,6 @@ public class ArticleController extends Controller {
 		System.out.printf("%d번 글이 생성 되었습니다.\n", id);
 		lastArticleId++;
 	}
-
 	private void showList() {
 		System.out.println("==게시글 목록==");
 		if (articles.size() == 0) {
@@ -78,21 +81,30 @@ public class ArticleController extends Controller {
 				return;
 			}
 		}
+
+		String writerName = null;
+
 		System.out.println("  번호    /   작성일  /   작성자   /  제목   /   조회  ");
 		for (int i = forPrintArticles.size() - 1; i >= 0; i--) {
 			Article article = forPrintArticles.get(i);
-			if (Util.getNowDate_TimeStr().split(" ")[0].equals(article.getRegDate().split(" ")[0])) {
-				System.out.printf("  %4d  /   %5s    /     %d   /   %s    /   %d\n", article.getId(),
-						article.getRegDate().split(" ")[1], article.getMemberId(), article.getTitle(),
-						article.getHit());
-			} else {
-				System.out.printf("  %4d  /   %5s    /     %d   /   %s    /   %d\n", article.getId(),
-						article.getRegDate().split(" ")[0], article.getMemberId(), article.getTitle(),
-						article.getHit());
+
+			for (Member member : members) {
+				if (article.getMemberId() == member.getId()) {
+					writerName = member.getName();
+					break;
+				}
 			}
+
+			if (Util.getNowDate_TimeStr().split(" ")[0].equals(article.getRegDate().split(" ")[0])) {
+				System.out.printf("  %4d  /   %5s    /     %s   /   %s    /   %d\n", article.getId(),
+						article.getRegDate().split(" ")[1], writerName, article.getTitle(), article.getHit());
+			} else {
+				System.out.printf("  %4d  /   %5s    /     %s   /   %s    /   %d\n", article.getId(),
+						article.getRegDate().split(" ")[0], writerName, article.getTitle(), article.getHit());
+			}
+
 		}
 	}
-
 	private void showDetail() {
 		String[] cmdDiv = cmd.split(" ");
 		int id = 0;
@@ -116,7 +128,6 @@ public class ArticleController extends Controller {
 		System.out.println("조회 : " + foundArticle.getHit());
 		foundArticle.setHit(foundArticle.getHit() + 1);
 	}
-
 	private void doDelete() {
 		String[] cmdDiv = cmd.split(" ");
 		int id = 0;
@@ -131,17 +142,13 @@ public class ArticleController extends Controller {
 			System.out.printf("%d번 게시글은 없습니다\n", id);
 			return;
 		}
-
 		if (foundArticle.getMemberId() != loginedMember.getId()) {
 			System.out.println("권한 없음");
 			return;
 		}
-
 		articles.remove(foundArticle);
 		System.out.println(id + "번 글이 삭제되었습니다.");
-
 	}
-
 	private void doModify() {
 		String[] cmdDiv = cmd.split(" ");
 		int id = 0;
@@ -156,12 +163,10 @@ public class ArticleController extends Controller {
 			System.out.printf("%d번 게시글은 없습니다\n", id);
 			return;
 		}
-
 		if (foundArticle.getMemberId() != loginedMember.getId()) {
 			System.out.println("권한 없음");
 			return;
 		}
-
 		System.out.println("기존 제목 : " + foundArticle.getTitle());
 		System.out.println("기존 내용 : " + foundArticle.getBody());
 		System.out.print("새 제목 : ");
@@ -173,7 +178,6 @@ public class ArticleController extends Controller {
 		foundArticle.setBody(newBody);
 		System.out.println(id + "번 글이 수정되었습니다.");
 	}
-
 	private Article getArticleById(int id) {
 		for (Article article : articles) {
 			if (article.getId() == id) {
@@ -182,7 +186,6 @@ public class ArticleController extends Controller {
 		}
 		return null;
 	}
-
 	public void makeTestData() {
 		System.out.println("테스트를 위한 게시글 데이터를 생성합니다.");
 		articles.add(new Article(1, "2023-12-12 12:12:12", Util.getNowDate_TimeStr(), 3, "제목123", "내용1", 11));
