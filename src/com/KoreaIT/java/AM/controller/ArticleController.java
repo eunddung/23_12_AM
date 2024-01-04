@@ -21,10 +21,6 @@ public class ArticleController extends Controller {
 		this.cmd = cmd;
 		switch (actionMethodName) {
 		case "write":
-			if (isLogined() == false) {
-				System.out.println("로그인 하고 이용해");
-				break;
-			}
 			doWrite();
 			break;
 		case "list":
@@ -34,17 +30,9 @@ public class ArticleController extends Controller {
 			showDetail();
 			break;
 		case "modify":
-			if (isLogined() == false) {
-				System.out.println("로그인 하고 이용해");
-				break;
-			}
 			doModify();
 			break;
 		case "delete":
-			if (isLogined() == false) {
-				System.out.println("로그인 하고 이용해");
-				break;
-			}
 			doDelete();
 			break;
 		default:
@@ -62,10 +50,8 @@ public class ArticleController extends Controller {
 		String title = sc.nextLine();
 		System.out.print("내용 : ");
 		String body = sc.nextLine();
-
 		Article article = new Article(id, regDate, updateDate, loginedMember.getId(), title, body);
 		articles.add(article);
-
 		System.out.printf("%d번 글이 생성 되었습니다.\n", id);
 		lastArticleId++;
 	}
@@ -92,7 +78,6 @@ public class ArticleController extends Controller {
 				return;
 			}
 		}
-
 		System.out.println("  번호    /   작성일  /   작성자   /  제목   /   조회  ");
 		for (int i = forPrintArticles.size() - 1; i >= 0; i--) {
 			Article article = forPrintArticles.get(i);
@@ -105,7 +90,6 @@ public class ArticleController extends Controller {
 						article.getRegDate().split(" ")[0], article.getMemberId(), article.getTitle(),
 						article.getHit());
 			}
-
 		}
 	}
 
@@ -147,8 +131,15 @@ public class ArticleController extends Controller {
 			System.out.printf("%d번 게시글은 없습니다\n", id);
 			return;
 		}
+
+		if (foundArticle.getMemberId() != loginedMember.getId()) {
+			System.out.println("권한 없음");
+			return;
+		}
+
 		articles.remove(foundArticle);
 		System.out.println(id + "번 글이 삭제되었습니다.");
+
 	}
 
 	private void doModify() {
@@ -165,6 +156,12 @@ public class ArticleController extends Controller {
 			System.out.printf("%d번 게시글은 없습니다\n", id);
 			return;
 		}
+
+		if (foundArticle.getMemberId() != loginedMember.getId()) {
+			System.out.println("권한 없음");
+			return;
+		}
+
 		System.out.println("기존 제목 : " + foundArticle.getTitle());
 		System.out.println("기존 내용 : " + foundArticle.getBody());
 		System.out.print("새 제목 : ");
@@ -192,5 +189,4 @@ public class ArticleController extends Controller {
 		articles.add(new Article(2, "2024-01-01 12:12:12", Util.getNowDate_TimeStr(), 2, "제목2", "내용2", 22));
 		articles.add(new Article(3, Util.getNowDate_TimeStr(), Util.getNowDate_TimeStr(), 2, "제목1233", "내용3", 33));
 	}
-
 }
